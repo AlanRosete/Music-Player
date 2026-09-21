@@ -1,0 +1,7 @@
+[build]
+  # Sin esto apunta a /src/main.jsx: el navegador recibe JSX sin compilar y falla silenciosamente.
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"

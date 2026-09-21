@@ -4,9 +4,12 @@ import { Vinyl } from './components/Vinyl.jsx';
 import { TrackList } from './components/TrackList.jsx';
 import { Controls } from './components/Controls.jsx';
 import { Browser } from './components/Browser.jsx';
+import { ThemeToggle } from './components/ThemeToggle.jsx';
+import { useTheme } from './hooks/useTheme.js';
 
 export default function App() {
   const catalog = useCatalog();
+  const { theme, toggle: toggleTheme } = useTheme();
   const player = usePlayer(catalog.tracks);
   const {
     track, index, isPlaying, progress, duration, seek, selectTrack, setIsSeeking, loadError,
@@ -25,7 +28,9 @@ export default function App() {
 
       <main className="stage">
         <nav className="stage__nav">
-          <span className="stage__logo">S/M</span>
+          <div className="stage__brand">
+            <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          </div>
           <Browser catalog={catalog} />
         </nav>
 

@@ -55,7 +55,8 @@ npm run preview  # sirve el build
 - Vinilo que gira, con anillo de progreso arrastrable alrededor del disco
 - Portadas oficiales en 600×600 mod por un regex
 - Lista con scroll propio y limitada, para no generar un extend
-- Modo claro / oscuro automático según el sistema
+- Interruptor de tema claro/oscuro, recordado en `localStorage`
+  (arranca con la preferencia del sistema, después manda la elección)
 - Responsive: dos columnas en escritorio, apilado en móvil
 
 **Accesibilidad**
@@ -90,11 +91,13 @@ src/
   itunes.js             cliente de la API y colecciones
   hooks/usePlayer.js    motor de audio y estado
   hooks/useCatalog.js   carga del catálogo y búsqueda
+  hooks/useTheme.js     tema claro/oscuro persistido
   components/
     Vinyl.jsx           disco + anillo de progreso
     TrackList.jsx       lista de pistas
     Controls.jsx        transporte y volumen
     Browser.jsx         pestañas y buscador
+    ThemeToggle.jsx     interruptor de tema
     icons.jsx           iconos SVG
   styles/index.css      tokens y estilos
 public/

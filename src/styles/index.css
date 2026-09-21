@@ -16,7 +16,9 @@
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
-:root:not([data-theme='light']) {
+/* Preferencia del OS: aplica hasta que se elige un tema. A partir de ahí manda el atributo data-theme. */
+   
+:root:not([data-theme]) {
   @media (prefers-color-scheme: dark) {
     --paper: #131211;
     --card: #1b1a18;
@@ -28,6 +30,18 @@
     --disc: #060606;
     --disc-groove: #1e1e1e;
   }
+}
+
+:root[data-theme='light'] {
+  --paper: #e8e6e1;
+  --card: #fbfaf7;
+  --ink: #0d0d0d;
+  --ink-soft: #6b6b6b;
+  --ink-faint: #a8a5a0;
+  --rule: #ddd9d2;
+  --accent: #c8452f;
+  --disc: #101010;
+  --disc-groove: #262626;
 }
 
 :root[data-theme='dark'] {
@@ -122,6 +136,41 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   font-weight: 700;
   letter-spacing: 0.12em;
 }
+
+/* Theme toggle */
+
+.stage__brand { display: flex; align-items: center; gap: 12px; }
+
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--ink-soft);
+  transition: color 0.18s var(--ease), background-color 0.18s var(--ease);
+}
+
+.theme-toggle:hover {
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 7%, transparent);
+}
+
+.theme-toggle__icons {
+  position: relative;
+  display: grid;
+  width: 15px;
+  height: 15px;
+}
+
+.theme-toggle__icons > svg {
+  grid-area: 1 / 1;
+  transition: opacity 0.26s var(--ease), transform 0.26s var(--ease);
+}
+
+.theme-toggle__moon { opacity: 0; transform: rotate(-70deg) scale(0.5); }
+.theme-toggle__icons.is-dark .theme-toggle__sun { opacity: 0; transform: rotate(70deg) scale(0.5); }
+.theme-toggle__icons.is-dark .theme-toggle__moon { opacity: 1; transform: none; }
 
 .stage__links {
   display: flex;
