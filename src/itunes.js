@@ -58,7 +58,6 @@ export const COLLECTIONS = [
     id: 'top',
     label: 'Top',
     title: ['TOP', 'CHARTS'],
-    query: 'Morgan Wallen Drake KAROL G Olivia Rodrigo',
     terms: ['Ariana Grande', 'Rels B', 'Drake', 'KAROL G', 'Russ', 'Future'],
   },
   {

@@ -99,7 +99,6 @@ src/
   styles/index.css      tokens y estilos
 public/
   images/favicon.ico
-  music/, images/       assets del catálogo local anterior
 ```
 
 ## Deploy
