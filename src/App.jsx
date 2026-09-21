@@ -19,7 +19,7 @@ export default function App() {
   return (
     <div className="shell">
       <header className="masthead">
-        <h1 className="masthead__brand">Saviom</h1>
+        <h1 className="masthead__brand">Music Player</h1>
         <p className="masthead__tagline">Music Streaming</p>
       </header>
 

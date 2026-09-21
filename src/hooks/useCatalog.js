@@ -59,7 +59,7 @@ export function useCatalog() {
     if (!term) return undefined;
 
     const timer = setTimeout(() => {
-      run((signal) => searchTracks(term, { limit: 25, signal }));
+      run((signal) => searchTracks(term, { limit: 30, signal }));
     }, 450);
 
     return () => clearTimeout(timer);
