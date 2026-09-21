@@ -1,14 +1,33 @@
 # Music Player
 
-Reproductor de música con estética editorial, construido con React + Vite.
+Reproductor de música con estética editorial, construido con React + Vite + iTunes.
 
 ![preview](docs/preview.png)
 
 ## Stack
 
 - React 18 + Vite 6 (sin framework de UI, CSS plano con custom properties)
+- Catálogo desde la **iTunes Search API** — sin cuenta ni API key
 - Sin dependencias de iconos: los SVG son inline
 - Audio con la API `HTMLAudioElement` nativa
+
+## Sobre el catálogo
+
+Las pistas vienen de la [iTunes Search API](https://performance-partners.apple.com/search-api),
+un endpoint público de Apple: **no requiere registro, cuenta ni clave**.
+
+Dos límites que conviene conocer:
+
+- **Los audios son vistas previas de 30 s.** Apple no expone las pistas
+  completas. La lista muestra la duración real de cada canción, pero lo unico que
+  suena son 30 segundos.
+- **No hay un endpoint de charts accesible.** Apple publica un feed de "Top
+  Songs" en `rss.applemarketingtools.com`, pero no envía cabeceras CORS y el
+  navegador lo bloquea. Por eso las colecciones de `src/itunes.js` aproximan el
+  top buscando artistas que figuran en esas listas generando un access.
+
+Para editar las colecciones, tocá `COLLECTIONS` en
+[`src/itunes.js`](src/itunes.js).
 
 ## Desarrollo
 
@@ -27,9 +46,15 @@ npm run preview  # sirve el build
 - Repetir: `off` → `all` → `one`
 - "Anterior" reinicia la pista si ya pasaron 3 s, como en Spotify
 
+**Catálogo**
+- Colecciones curadas: Top, Latino, Indie y R&B
+- Búsqueda de cualquier artista o canción, con debounce
+- Estados de carga, error con reintento y sin resultados
+
 **Interfaz**
 - Vinilo que gira, con anillo de progreso arrastrable alrededor del disco
-- Lista de pistas con duraciones leídas de los metadatos de cada archivo
+- Portadas oficiales en 600×600 mod por un regex
+- Lista con scroll propio y limitada, para no generar un extend
 - Modo claro / oscuro automático según el sistema
 - Responsive: dos columnas en escritorio, apilado en móvil
 
@@ -40,6 +65,9 @@ npm run preview  # sirve el build
 
 **Integración con el sistema**
 - Media Session API: controles nativos y teclas de medios del teclado
+
+**Responsive**
+- Se adapta al alto de la ventana, no solo al ancho
 
 ### Atajos de teclado
 
@@ -59,36 +87,20 @@ npm run preview  # sirve el build
 src/
   main.jsx              punto de entrada
   App.jsx               composición del layout
-  tracks.js             catálogo de pistas
+  itunes.js             cliente de la API y colecciones
   hooks/usePlayer.js    motor de audio y estado
+  hooks/useCatalog.js   carga del catálogo y búsqueda
   components/
     Vinyl.jsx           disco + anillo de progreso
     TrackList.jsx       lista de pistas
     Controls.jsx        transporte y volumen
+    Browser.jsx         pestañas y buscador
     icons.jsx           iconos SVG
   styles/index.css      tokens y estilos
 public/
-  music/                archivos .mp3
-  images/               portadas
+  images/favicon.ico
+  music/, images/       assets del catálogo local anterior
 ```
-
-## Agregar música
-
-Colocá el `.mp3` en `public/music/` y la portada en `public/images/`, después
-sumá la entrada en [`src/tracks.js`](src/tracks.js):
-
-```js
-{
-  id: 'mi-cancion',
-  name: 'Mi Canción',
-  artist: 'Artista',
-  album: 'Álbum',
-  cover: 'images/mi-portada.jpg',
-  src: 'music/mi-cancion.mp3',
-}
-```
-
-> Los clips incluidos duran 30 s: son fragmentos, no las pistas completas.
 
 ## Deploy
 

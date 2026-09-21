@@ -72,12 +72,13 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 
 .shell {
-  min-height: 100%;
+  /* dvh evita que las barras del navegador móvil descuadren el alto. */
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: clamp(18px, 4vh, 40px);
-  padding: clamp(20px, 5vh, 48px) 16px;
+  gap: clamp(10px, 2.6vh, 34px);
+  padding: clamp(12px, 3vh, 44px) 16px;
 }
 
 .masthead, .colophon { text-align: center; }
@@ -105,7 +106,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background: var(--card);
   border-radius: var(--radius);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 24px 60px -24px rgb(0 0 0 / 0.22);
-  padding: clamp(20px, 3vw, 34px) clamp(20px, 3.4vw, 44px) clamp(24px, 3vw, 38px);
+  padding: clamp(14px, 2.6vh, 34px) clamp(20px, 3.4vw, 44px) clamp(16px, 2.6vh, 38px);
   overflow: hidden;
 }
 
@@ -113,7 +114,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-bottom: clamp(14px, 2.4vw, 26px);
+  padding-bottom: clamp(10px, 2vh, 26px);
 }
 
 .stage__logo {
@@ -147,7 +148,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .stage__body {
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-  gap: clamp(20px, 3.5vw, 56px);
+  gap: clamp(16px, 3vw, 56px);
   align-items: center;
 }
 
@@ -162,7 +163,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .stage__right {
   display: flex;
   flex-direction: column;
-  gap: clamp(16px, 2.4vw, 28px);
+  gap: clamp(10px, 2vh, 26px);
   min-width: 0;
 }
 
@@ -170,7 +171,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .vinyl {
   position: relative;
-  width: min(520px, 82vw);
+  width: min(520px, 82vw, 62vh);
   aspect-ratio: 1;
 }
 
@@ -315,7 +316,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   margin: 0;
   display: flex;
   flex-direction: column;
-  font-size: clamp(2.6rem, 7.2vw, 5.6rem);
+  font-size: min(clamp(2.6rem, 7.2vw, 5.6rem), 11vh);
   font-weight: 700;
   line-height: 0.88;
   letter-spacing: -0.035em;
@@ -342,7 +343,24 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   color: var(--accent);
 }
 
-.tracklist__items { margin: 0; padding: 0; list-style: none; }
+.tracklist__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: min(320px, 34vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule) transparent;
+}
+
+.tracklist__items::-webkit-scrollbar { width: 6px; }
+.tracklist__items::-webkit-scrollbar-track { background: transparent; }
+.tracklist__items::-webkit-scrollbar-thumb {
+  background: var(--rule);
+  border-radius: 999px;
+}
+.tracklist__items::-webkit-scrollbar-thumb:hover { background: var(--ink-faint); }
 
 .track {
   width: 100%;
@@ -522,14 +540,142 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .controls__time-now { color: var(--ink); font-weight: 500; }
 
+/* Browser: pestañas de colección y buscador */
+.browser {
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.6vw, 20px);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.browser__tabs { display: flex; gap: 4px; }
+
+.chip {
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  transition: color 0.18s var(--ease), background-color 0.18s var(--ease);
+}
+
+.chip:hover { color: var(--ink); background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.chip.is-active { color: var(--card); background: var(--ink); }
+
+.browser__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--rule);
+  color: var(--ink-faint);
+  transition: border-color 0.18s var(--ease);
+}
+
+.browser__search:focus-within { border-color: var(--accent); color: var(--ink); }
+
+.browser__search input {
+  width: clamp(120px, 15vw, 190px);
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+}
+
+.browser__search input:focus { outline: none; }
+.browser__search input::placeholder { color: var(--ink-faint); }
+.browser__search input::-webkit-search-cancel-button { display: none; }
+
+.browser__clear {
+  font-size: 0.66rem;
+  line-height: 1;
+  color: var(--ink-faint);
+  padding: 2px;
+}
+
+.browser__clear:hover { color: var(--accent); }
+
+.browser__spinner {
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid var(--rule);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.tracklist__state {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 18px 4px;
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+}
+
+.tracklist__state p { margin: 0; }
+
+.tracklist__retry {
+  padding: 5px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background-color 0.18s var(--ease), color 0.18s var(--ease);
+}
+
+.tracklist__retry:hover { background: var(--accent); color: #fff; }
+
+.stage__error {
+  margin: 0;
+  font-size: 0.7rem;
+  color: var(--accent);
+}
+
+.track--skeleton { cursor: default; }
+
+.sk {
+  display: block;
+  border-radius: 3px;
+  background: linear-gradient(
+    90deg,
+    var(--rule) 0%,
+    color-mix(in srgb, var(--rule) 45%, transparent) 50%,
+    var(--rule) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.3s linear infinite;
+}
+
+.sk--line { height: 9px; }
+.sk--sm { height: 7px; }
+.sk--time { width: 30px; height: 8px; }
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
 /* Gestion de media querys */
 @media (max-width: 900px) {
   .shell { justify-content: flex-start; }
+  .stage__nav { flex-direction: column; align-items: stretch; gap: 10px; }
+  .browser { justify-content: space-between; }
   .stage__body { grid-template-columns: 1fr; gap: 24px; }
   .stage__left { margin-left: 0; order: 1; justify-content: center; }
   .stage__right { order: 2; }
   .vinyl { width: min(330px, 68vw); }
-  /* Disco más chico → el badge baja para no tapar la portada que vive en el centro. */
   .vinyl__badge { bottom: 14%; }
   .feature__title { text-align: center; align-items: center; }
   .feature__genres { text-align: center; }
@@ -546,4 +692,23 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   .vinyl__badge { bottom: 11%; max-width: 78%; }
   .track { grid-template-columns: auto 30px minmax(0, 1fr) auto; gap: 10px; }
   .controls__transport { gap: 2px; }
+  .browser { flex-direction: column; align-items: stretch; gap: 8px; }
+  .browser__tabs { justify-content: center; flex-wrap: wrap; }
+  .browser__search input { width: 100%; }
+}
+
+@media (min-width: 901px) and (max-height: 760px) {
+  .masthead__tagline, .colophon__title { display: none; }
+  .colophon__sub { margin-top: 0; }
+  .track { padding: 6px 8px; }
+  .track__cover { width: 30px; height: 30px; }
+  .ctrl { width: 32px; height: 32px; }
+  .ctrl--primary { width: 42px; height: 42px; margin: 0 4px; }
+  .tracklist__title { margin-bottom: 6px; }
+  .feature__genres { margin-top: 8px; }
+}
+
+@media (min-width: 901px) and (max-height: 660px) {
+  .masthead, .colophon { display: none; }
+  .track__album { display: none; }
 }

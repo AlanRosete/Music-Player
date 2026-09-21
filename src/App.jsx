@@ -1,12 +1,20 @@
 import { usePlayer } from './hooks/usePlayer.js';
-import { TRACKS, FEATURED } from './tracks.js';
+import { useCatalog } from './hooks/useCatalog.js';
 import { Vinyl } from './components/Vinyl.jsx';
 import { TrackList } from './components/TrackList.jsx';
 import { Controls } from './components/Controls.jsx';
+import { Browser } from './components/Browser.jsx';
 
 export default function App() {
-  const player = usePlayer(TRACKS);
-  const { track, index, isPlaying, progress, duration, seek, selectTrack, setIsSeeking } = player;
+  const catalog = useCatalog();
+  const player = usePlayer(catalog.tracks);
+  const {
+    track, index, isPlaying, progress, duration, seek, selectTrack, setIsSeeking, loadError,
+  } = player;
+
+  const title = catalog.query.trim()
+    ? ['SEARCH', 'RESULTS']
+    : catalog.collection.title;
 
   return (
     <div className="shell">
@@ -18,11 +26,7 @@ export default function App() {
       <main className="stage">
         <nav className="stage__nav">
           <span className="stage__logo">S/M</span>
-          <ul className="stage__links">
-            <li><a href="#tracklist">Artists</a></li>
-            <li><a href="#tracklist">Mixtapes</a></li>
-            <li><a href="#tracklist">Awards</a></li>
-          </ul>
+          <Browser catalog={catalog} />
         </nav>
 
         <div className="stage__body">
@@ -41,21 +45,27 @@ export default function App() {
           <div className="stage__right">
             <section className="feature">
               <h2 className="feature__title">
-                {FEATURED.title.map((line) => (
+                {title.map((line) => (
                   <span key={line} className="feature__line">{line}</span>
                 ))}
               </h2>
-              <p className="feature__genres">{FEATURED.genres.join(', ')}</p>
+              <p className="feature__genres">
+                {track ? `${track.genre || 'Music'} · vista previa de 30 s` : 'iTunes Search API'}
+              </p>
             </section>
 
-            <div id="tracklist">
-              <TrackList
-                tracks={TRACKS}
-                currentIndex={index}
-                isPlaying={isPlaying}
-                onSelect={selectTrack}
-              />
-            </div>
+            <TrackList
+              catalog={catalog}
+              currentIndex={index}
+              isPlaying={isPlaying}
+              onSelect={selectTrack}
+            />
+
+            {loadError && (
+              <p className="stage__error" role="alert">
+                No se pudo cargar el audio de esta pista.
+              </p>
+            )}
 
             <Controls player={player} />
           </div>
@@ -65,7 +75,7 @@ export default function App() {
       <footer className="colophon">
         <p className="colophon__title">Now Playing</p>
         <p className="colophon__sub">
-          {track.name} — {track.artist}
+          {track ? `${track.name} — ${track.artist}` : 'Cargando catálogo…'}
         </p>
       </footer>
     </div>

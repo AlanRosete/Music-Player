@@ -17,13 +17,27 @@ export function usePlayer(tracks) {
   const [shuffle, setShuffle] = useState(false);
   const [repeat, setRepeat] = useState('off');
   const [isSeeking, setIsSeeking] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
-  const track = tracks[index];
+  // El índice puede quedar fuera de rango: se acota en lugar de devolver
+  // O undefined.
+  const safeIndex = tracks.length ? Math.min(index, tracks.length - 1) : 0;
+  const track = tracks[safeIndex];
+
+  // Al cambiar de catálogo se vuelve a la primera pista y reproduce en automatico PD.
+  const listKey = tracks.length ? `${tracks.length}:${tracks[0]?.id}` : 'empty';
+  const prevListKey = useRef(listKey);
+  useEffect(() => {
+    if (prevListKey.current !== listKey) {
+      prevListKey.current = listKey;
+      setIndex(0);
+    }
+  }, [listKey]);
 
   // Refs espejo para que los listeners del elemento <audio> lean el estado
   // actual sin tener que re-suscribirse en cada cambio.
-  const stateRef = useRef({ shuffle, repeat, index, isSeeking });
-  stateRef.current = { shuffle, repeat, index, isSeeking };
+  const stateRef = useRef({ shuffle, repeat, index: safeIndex, isSeeking });
+  stateRef.current = { shuffle, repeat, index: safeIndex, isSeeking, len: tracks.length };
 
   const pickNext = useCallback(
     (direction) => {
@@ -87,14 +101,18 @@ export function usePlayer(tracks) {
   }, []);
 
   // Carga la pista cuando cambia el índice y resetea el tiempo y duración respectivamente.
+  // Depende del src y no del objeto: al recargar el catálogo llegan objetos
+  // nuevos para la misma pista y recargar cortaría la reproducción.
+  const src = track?.src;
   useEffect(() => {
     const audio = audioRef.current;
-    if (!track) return;
-    audio.src = track.src;
+    if (!src) return;
+    setLoadError(false);
+    audio.src = src;
     audio.load();
     setCurrentTime(0);
     setDuration(0);
-  }, [track]);
+  }, [src]);
 
   // Sincroniza volumen / mute.
   useEffect(() => {
@@ -109,9 +127,10 @@ export function usePlayer(tracks) {
     const onTime = () => {
       if (!stateRef.current.isSeeking) setCurrentTime(audio.currentTime);
     };
-    const onMeta = () => setDuration(audio.duration || 0);
-    const onPlay = () => setIsPlaying(true);
+    const onMeta = () => { setDuration(audio.duration || 0); setLoadError(false); };
+    const onPlay = () => { setIsPlaying(true); setLoadError(false); };
     const onPause = () => setIsPlaying(false);
+    const onError = () => { setLoadError(true); setIsPlaying(false); };
     const onEnded = () => {
       if (stateRef.current.repeat === 'one') {
         audio.currentTime = 0;
@@ -134,6 +153,7 @@ export function usePlayer(tracks) {
     audio.addEventListener('play', onPlay);
     audio.addEventListener('pause', onPause);
     audio.addEventListener('ended', onEnded);
+    audio.addEventListener('error', onError);
 
     return () => {
       audio.removeEventListener('timeupdate', onTime);
@@ -142,6 +162,7 @@ export function usePlayer(tracks) {
       audio.removeEventListener('play', onPlay);
       audio.removeEventListener('pause', onPause);
       audio.removeEventListener('ended', onEnded);
+      audio.removeEventListener('error', onError);
     };
   }, [pickNext]);
 
@@ -217,9 +238,10 @@ export function usePlayer(tracks) {
 
   return {
     track,
-    index,
+    index: safeIndex,
     tracks,
     isPlaying,
+    loadError,
     currentTime,
     duration,
     volume,

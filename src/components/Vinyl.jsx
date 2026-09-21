@@ -49,7 +49,10 @@ export function Vinyl({ track, isPlaying, progress, duration, onSeek, onSeekStar
     <div className="vinyl">
       <div className={`vinyl__disc ${isPlaying ? 'is-spinning' : ''}`}>
         <div className="vinyl__grooves" />
-        <div className="vinyl__label" style={{ backgroundImage: `url(${track.cover})` }}>
+        <div
+          className="vinyl__label"
+          style={track?.cover ? { backgroundImage: `url(${track.cover})` } : undefined}
+        >
           <span className="vinyl__label-fade" />
         </div>
         <div className="vinyl__spindle" />
@@ -86,7 +89,7 @@ export function Vinyl({ track, isPlaying, progress, duration, onSeek, onSeekStar
         <span className="vinyl__badge-eq" aria-hidden="true">
           <i /><i /><i /><i />
         </span>
-        <span className="vinyl__badge-text">{track.name}</span>
+        <span className="vinyl__badge-text">{track?.name ?? 'Cargando…'}</span>
       </div>
     </div>
   );
